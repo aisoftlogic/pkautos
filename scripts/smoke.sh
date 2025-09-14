@@ -8,7 +8,7 @@ WEB_AUTOTRADER_URL=${WEB_AUTOTRADER_URL:-http://localhost:3002/api/healthz}
 urls=("$API_URL" "$WEB_AUTOMART_URL" "$WEB_AUTOTRADER_URL")
 
 failures=0
-max_attempts=${SMOKE_MAX_ATTEMPTS:-15}
+max_attempts=${SMOKE_MAX_ATTEMPTS:-5}
 sleep_seconds=${SMOKE_SLEEP_SECONDS:-2}
 
 for u in "${urls[@]}"; do
