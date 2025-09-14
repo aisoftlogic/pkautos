@@ -75,19 +75,19 @@
 - id: T1-003
   phase: 1
   title: Introduce pnpm workspace + lint config
-  status: open
+  status: done
   owner: dev
-  started: null
-  finished: null
-  artifacts: []
+  started: 2025-09-14T00:00:00Z
+  finished: 2025-09-14T00:00:00Z
+  artifacts: ["package.json","pnpm-workspace.yaml",".eslintrc.cjs",".prettierrc","commitlint.config.cjs"]
 - id: T1-004
   phase: 1
   title: Implement API health endpoints + OpenAPI stub
-  status: open
+  status: in-progress
   owner: backend
-  started: null
+  started: 2025-09-14T00:10:00Z
   finished: null
-  artifacts: []
+  artifacts: ["apps/api/src/modules/health","apps/api/src/openapi-gen.ts","apps/web-automart/src/pages/api/healthz.ts","apps/web-autotrader/src/pages/api/healthz.ts"]
 - id: T1-005
   phase: 1
   title: Add Makefile with core targets
