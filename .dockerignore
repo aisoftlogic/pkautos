@@ -1,0 +1,18 @@
+# Docker ignore for smaller contexts and faster builds
+node_modules
+.pnpm-store
+.git
+.gitignore
+Dockerfile
+**/Dockerfile
+**/.next/cache
+**/.turbo
+**/dist
+**/build
+**/.DS_Store
+**/coverage
+**/*.log
+.env
+.env.*
+.idea
+.vscode

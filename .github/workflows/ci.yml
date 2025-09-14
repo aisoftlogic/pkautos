@@ -8,6 +8,9 @@ on:
 jobs:
   build-test:
     runs-on: ubuntu-latest
+    env:
+      DOCKER_BUILDKIT: 1
+      COMPOSE_DOCKER_CLI_BUILD: 1
     permissions:
       contents: read
     steps:
@@ -53,3 +56,20 @@ jobs:
       - name: Show container logs (on failure)
         if: failure()
         run: docker compose logs --no-color
+
+      - name: Upload container logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-logs
+          path: |
+            $(pwd)/docker-compose.yml
+            $(pwd)/.github/workflows/ci.yml
+            $(pwd)/scripts/smoke.sh
+          if-no-files-found: ignore
+
+      - name: Cleanup stack
+        if: always()
+        run: |
+          docker compose ps
+          docker compose down -v

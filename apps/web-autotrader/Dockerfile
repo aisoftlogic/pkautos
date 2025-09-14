@@ -4,16 +4,16 @@ FROM node:${NODE_VERSION} AS base
 WORKDIR /app
 
 FROM base AS deps
-RUN corepack enable
+RUN corepack enable && corepack prepare pnpm@10.15.0 --activate
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml* .npmrc* ./
 COPY package.json package.json
 COPY apps/web-autotrader/package.json apps/web-autotrader/package.json
 COPY packages/*/package.json packages/*/package.json
-RUN pnpm install --filter @pkautos/web-autotrader... --no-frozen-lockfile
+RUN pnpm install --filter @pkautos/web-autotrader... --frozen-lockfile
 
 FROM base AS builder
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN corepack enable
+RUN corepack enable && corepack prepare pnpm@10.15.0 --activate
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN pnpm --filter @pkautos/web-autotrader build \
