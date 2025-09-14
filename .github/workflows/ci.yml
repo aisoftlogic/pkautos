@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [ main, develop ]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Node modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Login GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build images (multi-arch)
+        run: |
+          echo "TODO: docker buildx build --platform linux/amd64,linux/arm64 -t ghcr.io/org/api:dev ./apps/api"
+
+      - name: Trivy scan (TODO)
+        run: |
+          echo "TODO: trivy image ghcr.io/org/api:dev"
+
+      - name: Unit tests (placeholder)
+        run: |
+          echo "TODO: run jest"
+
+      - name: Helm lint (TODO)
+        run: |
+          echo "TODO: helm lint infra/helm/*"
+
+      - name: K8s deploy dev (TODO)
+        run: |
+          echo "TODO: helm upgrade --install release-name infra/helm/chart --namespace dev"
+
+      - name: Smoke tests (TODO)
+        run: |
+          echo "TODO: k6 run tests/perf/smoke.js"

@@ -1,0 +1,114 @@
+# Central task register
+# Fields: id, phase, title, status, owner, started, finished, artifacts
+
+- id: T0-001
+  phase: 0
+  title: Repo skeleton scaffolded
+  status: done
+  owner: system
+  started: 2025-09-13T00:00:00Z
+  finished: 2025-09-13T00:00:00Z
+  artifacts: ["directory-structure"]
+
+- id: T0-002
+  phase: 0
+  title: Placeholder Dockerfiles added
+  status: done
+  owner: system
+  started: 2025-09-13T00:05:00Z
+  finished: null
+  artifacts: ["apps/api/Dockerfile","apps/web-automart/Dockerfile","apps/web-autotrader/Dockerfile"]
+
+- id: T0-003
+  phase: 0
+  title: Tasks register initialized
+  status: done
+  owner: pm
+  started: null
+  finished: null
+  artifacts: ["tasks/tasks.yaml"]
+
+- id: T0-004
+  phase: 0
+  title: Phase documentation templates
+  status: done
+  owner: pm
+  started: null
+  finished: null
+  artifacts: []
+
+- id: T0-005
+  phase: 0
+  title: CI workflow skeleton
+  status: done
+  owner: devops
+  started: null
+  finished: null
+  artifacts: []
+
+- id: T0-006
+  phase: 0
+  title: Phase 0 plan authored
+  status: done
+  owner: pm
+  started: null
+  finished: null
+  artifacts: []
+
+# Phase 1 (carried from Phase 0 deferrals)
+- id: T1-001
+  phase: 1
+  title: Add docker-compose baseline stack
+  status: open
+  owner: devops
+  started: null
+  finished: null
+  artifacts: []
+- id: T1-002
+  phase: 1
+  title: Scaffold Helm charts & overlays
+  status: open
+  owner: devops
+  started: null
+  finished: null
+  artifacts: []
+- id: T1-003
+  phase: 1
+  title: Introduce pnpm workspace + lint config
+  status: open
+  owner: dev
+  started: null
+  finished: null
+  artifacts: []
+- id: T1-004
+  phase: 1
+  title: Implement API health endpoints + OpenAPI stub
+  status: open
+  owner: backend
+  started: null
+  finished: null
+  artifacts: []
+- id: T1-005
+  phase: 1
+  title: Add Makefile with core targets
+  status: open
+  owner: devops
+  started: null
+  finished: null
+  artifacts: []
+- id: T1-006
+  phase: 1
+  title: Keycloak realm export + OIDC wiring
+  status: open
+  owner: backend
+  started: null
+  finished: null
+  artifacts: []
+- id: T1-007
+  phase: 1
+  title: Observability services in compose
+  status: open
+  owner: devops
+  started: null
+  finished: null
+  artifacts: []
