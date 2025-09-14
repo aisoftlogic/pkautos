@@ -21,10 +21,7 @@ RUN corepack enable
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN pnpm --filter @pkautos/web-automart build \
-	&& cp -R apps/web-automart/.next .next \
-	&& cp apps/web-automart/package.json package.json \
-	&& mkdir -p public \
-	&& if [ -d apps/web-automart/public ]; then cp -R apps/web-automart/public/* public/; fi
+	&& mkdir -p apps/web-automart/public
 
 # 3. Runtime
 FROM base AS runner

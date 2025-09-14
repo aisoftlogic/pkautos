@@ -17,10 +17,7 @@ RUN corepack enable
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN pnpm --filter @pkautos/web-autotrader build \
-	&& cp -R apps/web-autotrader/.next .next \
-	&& cp apps/web-autotrader/package.json package.json \
-	&& mkdir -p public \
-	&& if [ -d apps/web-autotrader/public ]; then cp -R apps/web-autotrader/public/* public/; fi
+	&& mkdir -p apps/web-autotrader/public
 
 FROM base AS runner
 ENV NODE_ENV=production

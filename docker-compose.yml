@@ -22,7 +22,6 @@ services:
     build:
       context: .
       dockerfile: apps/web-automart/Dockerfile
-    command: sh -c "node node_modules/next/dist/bin/next start -p 3001"
     working_dir: /app
     depends_on:
       - api
@@ -41,7 +40,6 @@ services:
     build:
       context: .
       dockerfile: apps/web-autotrader/Dockerfile
-    command: sh -c "node node_modules/next/dist/bin/next start -p 3002"
     working_dir: /app
     depends_on:
       - api
