@@ -3,7 +3,8 @@ version: "3.9"
 services:
   api:
     build:
-      context: ./apps/api
+      context: .
+      dockerfile: apps/api/Dockerfile
     command: node dist/main.js
     working_dir: /app
     volumes:
@@ -23,7 +24,8 @@ services:
 
   web-automart:
     build:
-      context: ./apps/web-automart
+      context: .
+      dockerfile: apps/web-automart/Dockerfile
     command: sh -c "node node_modules/next/dist/bin/next start -p 3001"
     working_dir: /app
     volumes:
@@ -43,7 +45,8 @@ services:
 
   web-autotrader:
     build:
-      context: ./apps/web-autotrader
+      context: .
+      dockerfile: apps/web-autotrader/Dockerfile
     command: sh -c "node node_modules/next/dist/bin/next start -p 3002"
     working_dir: /app
     volumes:
