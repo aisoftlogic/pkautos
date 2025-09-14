@@ -7,8 +7,6 @@ services:
       dockerfile: apps/api/Dockerfile
     command: node dist/main.js
     working_dir: /app
-    volumes:
-      - ./apps/api:/app
     depends_on:
       - postgres
     environment:
@@ -28,8 +26,6 @@ services:
       dockerfile: apps/web-automart/Dockerfile
     command: sh -c "node node_modules/next/dist/bin/next start -p 3001"
     working_dir: /app
-    volumes:
-      - ./apps/web-automart:/app
     depends_on:
       - api
     environment:
@@ -49,8 +45,6 @@ services:
       dockerfile: apps/web-autotrader/Dockerfile
     command: sh -c "node node_modules/next/dist/bin/next start -p 3002"
     working_dir: /app
-    volumes:
-      - ./apps/web-autotrader:/app
     depends_on:
       - api
     environment:
