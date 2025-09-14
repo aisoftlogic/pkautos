@@ -6,6 +6,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter({ logger: true }));
 
+
   const config = new DocumentBuilder()
     .setTitle('PKAutos API')
     .setDescription('Initial OpenAPI stub')
@@ -16,6 +17,9 @@ async function bootstrap() {
 
   const port = parseInt(process.env.PORT || '3000', 10);
   await app.listen({ port, host: '0.0.0.0' });
+  // Startup log for container health debugging
+  // eslint-disable-next-line no-console
+  console.log(`API listening on port ${port}`);
 }
 
 bootstrap();
