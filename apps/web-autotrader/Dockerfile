@@ -28,9 +28,8 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN adduser -D nextjs
 USER nextjs
 WORKDIR /app
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
+COPY --from=builder /app/apps/web-autotrader/.next/standalone ./standalone
+COPY --from=builder /app/apps/web-autotrader/.next/static ./apps/web-autotrader/.next/static
+COPY --from=builder /app/apps/web-autotrader/public ./apps/web-autotrader/public
 EXPOSE 3000
-CMD ["node","node_modules/next/dist/bin/next","start","-p","3000"]
+CMD ["node","standalone/apps/web-autotrader/server.js"]
