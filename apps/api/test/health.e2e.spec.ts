@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { Test } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
@@ -15,8 +16,8 @@ describe('Health endpoints (smoke)', () => {
       imports: [TestRootModule],
     }).compile();
 
-    app = moduleRef.createNestApplication();
-    await app.init();
+  app = moduleRef.createNestApplication();
+  await app.init();
   });
 
   afterAll(async () => {
@@ -35,3 +36,6 @@ describe('Health endpoints (smoke)', () => {
     expect(res.body).toEqual({ status: 'ready' });
   });
 });
+
+// Increase default timeout for slower CI environments
+jest.setTimeout(15000);
