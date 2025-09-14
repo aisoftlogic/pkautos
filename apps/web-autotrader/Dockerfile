@@ -6,7 +6,9 @@ WORKDIR /app
 FROM base AS deps
 RUN corepack enable
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml* .npmrc* ./
-RUN pnpm install --frozen-lockfile
+COPY apps/*/package.json apps/*/package.json
+COPY packages/*/package.json packages/*/package.json
+RUN pnpm install --filter @pkautos/web-autotrader... --frozen-lockfile
 
 FROM base AS builder
 ENV NEXT_TELEMETRY_DISABLED=1

@@ -7,7 +7,10 @@ WORKDIR /app
 FROM base AS deps
 RUN corepack enable
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml* .npmrc* ./
-RUN pnpm install --frozen-lockfile
+# Copy workspace manifests to allow filtered install to resolve deps
+COPY apps/*/package.json apps/*/package.json
+COPY packages/*/package.json packages/*/package.json
+RUN pnpm install --filter @pkautos/web-automart... --frozen-lockfile
 
 # 2. Builder layer
 FROM base AS builder
