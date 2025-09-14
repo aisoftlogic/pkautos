@@ -1,9 +1,23 @@
+// Minimal Response polyfill for unit test environment
+// @ts-ignore
+if (!global.Response) {
+  class SimpleResponse {
+    readonly status: number; headers: Record<string,string>; private _body: string;
+    constructor(body: string, init?: { status?: number; headers?: Record<string,string> }) {
+      this._body = body; this.status = init?.status ?? 200; this.headers = init?.headers ?? {}; }
+    async json() { return JSON.parse(this._body); }
+    async text() { return this._body; }
+  }
+  // @ts-ignore
+  global.Response = SimpleResponse;
+}
+
 describe('web-automart /api/healthz route', () => {
   it('responds with ok status JSON', async () => {
-    // Dynamic import the route handler module
     const mod = await import('../app/api/healthz/route');
-    const res = await mod.GET();
+    const res: any = await mod.GET();
     const data = await res.json();
     expect(data).toEqual({ status: 'ok' });
+    expect(res.status).toBe(200);
   });
 });

@@ -24,7 +24,8 @@
     "eslint-config-prettier": "^9.1.0",
     "commitlint": "^19.3.0",
     "@commitlint/config-conventional": "^19.2.2"
-  ,"husky": "^9.0.11"
+  ,"husky": "^9.0.11",
+  "jest-environment-jsdom": "^29.7.0"
   },
   "engines": {
     "node": ">=18"

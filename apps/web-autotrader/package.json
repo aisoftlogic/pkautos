@@ -6,8 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-  "lint": "next lint",
-  "test": "jest --passWithNoTests"
+    "lint": "next lint",
+    "test": "CI=1 jest --passWithNoTests --runInBand --watchAll=false"
   },
   "dependencies": {
     "next": "14.2.5",
@@ -22,6 +22,7 @@
     "ts-jest": "^29.2.5",
     "@types/jest": "^29.5.12",
     "@testing-library/react": "^14.2.2",
-    "@testing-library/jest-dom": "^6.4.8"
+    "@testing-library/jest-dom": "^6.4.8",
+    "undici": "^6.19.8"
   }
 }
