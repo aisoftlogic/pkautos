@@ -18,12 +18,21 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'pnpm'
+          # caching handled by pnpm/action-setup later; corepack will manage pnpm binary
 
-      - name: Setup pnpm
+      - name: Enable corepack & prepare pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@9 --activate
+
+      - name: Setup pnpm (cache)
         uses: pnpm/action-setup@v3
         with:
           version: 9
+          run_install: false
+
+      - name: pnpm store path
+        run: pnpm config set store-dir .pnpm-store
 
       - name: Install dependencies (workspace)
         run: pnpm install --frozen-lockfile
