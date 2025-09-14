@@ -1,5 +1,2 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-
-export default function handler(_req: NextApiRequest, res: NextApiResponse) {
-  res.status(200).json({ status: 'ok' });
-}
+// RENAMED / DEPRECATED: Legacy pages API route disabled to prevent conflict with app router.
+export {};

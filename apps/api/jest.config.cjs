@@ -15,6 +15,14 @@ module.exports = {
   moduleFileExtensions: ['ts', 'js', 'json'],
   testEnvironment: 'node',
   collectCoverage: false,
+  coverageThreshold: {
+    global: {
+      statements: 70,
+      branches: 70,
+      functions: 70,
+      lines: 70
+    }
+  },
   globals: {},
   // Enable experimental decorators via ts-jest using the TS compiler options already present
   setupFilesAfterEnv: [],

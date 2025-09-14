@@ -1,0 +1,56 @@
+name: Release Images
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    env:
+      DOCKER_BUILDKIT: 1
+      COMPOSE_DOCKER_CLI_BUILD: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Enable corepack & prepare pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.15.0 --activate
+
+      - name: Install workspace deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Build images
+        run: |
+          IMAGE_REGISTRY=ghcr.io/${{ github.repository_owner }}
+          docker build -f apps/api/Dockerfile -t $IMAGE_REGISTRY/pkautos-api:${GITHUB_REF_NAME} -t $IMAGE_REGISTRY/pkautos-api:latest .
+          docker build -f apps/web-automart/Dockerfile -t $IMAGE_REGISTRY/pkautos-web-automart:${GITHUB_REF_NAME} -t $IMAGE_REGISTRY/pkautos-web-automart:latest .
+          docker build -f apps/web-autotrader/Dockerfile -t $IMAGE_REGISTRY/pkautos-web-autotrader:${GITHUB_REF_NAME} -t $IMAGE_REGISTRY/pkautos-web-autotrader:latest .
+
+      - name: Login GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push images
+        run: |
+          IMAGE_REGISTRY=ghcr.io/${{ github.repository_owner }}
+          docker push $IMAGE_REGISTRY/pkautos-api:${GITHUB_REF_NAME}
+          docker push $IMAGE_REGISTRY/pkautos-api:latest
+          docker push $IMAGE_REGISTRY/pkautos-web-automart:${GITHUB_REF_NAME}
+          docker push $IMAGE_REGISTRY/pkautos-web-automart:latest
+          docker push $IMAGE_REGISTRY/pkautos-web-autotrader:${GITHUB_REF_NAME}
+          docker push $IMAGE_REGISTRY/pkautos-web-autotrader:latest

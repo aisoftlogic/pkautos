@@ -1,0 +1,66 @@
+name: CI Smoke
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Build API
+        run: pnpm --filter @pkautos/api build || true
+
+      - name: Docker compose up
+        run: docker compose up -d --build
+
+      - name: Wait for baseline
+        run: sleep 15
+
+      - name: Health retry
+        run: bash scripts/health-retry.sh
+
+      - name: Smoke tests
+        run: bash scripts/smoke.sh
+
+      - name: Show docker ps
+        if: always()
+        run: docker ps
+
+      - name: Collector metrics sample
+        if: always()
+        run: curl -sf localhost:8888/metrics | head -n 30 || true
+
+      - name: Loki labels
+        if: always()
+        run: curl -sf 'http://localhost:3100/loki/api/v1/labels' | jq '.' || true
+
+      - name: Logs tail
+        if: always()
+        run: docker compose logs --tail=200 api otel-collector prometheus loki grafana || true
+
+      - name: Compose down
+        if: always()
+        run: docker compose down -v

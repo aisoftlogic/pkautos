@@ -1,0 +1,36 @@
+groups:
+  - name: api-availability
+    interval: 30s
+    rules:
+      - alert: ApiDown
+        expr: up{job="api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: API down
+          description: The API service has been unreachable for over 1 minute.
+
+  - name: high-error-rate
+    interval: 30s
+    rules:
+      - alert: High5xxErrorRate
+        expr: sum(increase(http_requests_total{status=~"5.."}[5m])) by (route) / sum(increase(http_requests_total[5m])) by (route) > 0.2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High 5xx error rate
+          description: More than 20% of requests resulted in 5xx responses in the last 5 minutes for route {{ $labels.route }}.
+
+  - name: slow-latency
+    interval: 30s
+    rules:
+      - alert: P95LatencyHigh
+        expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le)) > 1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: High latency p95
+          description: 95th percentile latency over 5m exceeds 1s.

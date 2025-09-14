@@ -44,6 +44,47 @@ jobs:
         working-directory: apps/api
         run: pnpm --filter @pkautos/api test || npm test
 
+      - name: API OTel span test (in-memory)
+        working-directory: apps/api
+        env:
+          OTEL_TEST_EXPORTER: inmemory
+        run: pnpm --filter @pkautos/api test -- otel-demo.e2e.spec.ts || pnpm test -- otel-demo.e2e.spec.ts
+
+      - name: Web automart tests
+        working-directory: apps/web-automart
+        run: pnpm --filter @pkautos/web-automart test || pnpm test
+
+      - name: Web autotrader tests
+        working-directory: apps/web-autotrader
+        run: pnpm --filter @pkautos/web-autotrader test || pnpm test
+
+      - name: API coverage
+        working-directory: apps/api
+        run: pnpm --filter @pkautos/api test:coverage || pnpm test:coverage
+
+      - name: Upload coverage (API)
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-api
+          path: apps/api/coverage
+          if-no-files-found: ignore
+
+      - name: Upload coverage (web-automart)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-web-automart
+          path: apps/web-automart/coverage
+          if-no-files-found: ignore
+
+      - name: Upload coverage (web-autotrader)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-web-autotrader
+          path: apps/web-autotrader/coverage
+          if-no-files-found: ignore
+
       - name: Build docker images (local)
         run: docker compose build api web-automart web-autotrader
 
@@ -73,3 +114,20 @@ jobs:
         run: |
           docker compose ps
           docker compose down -v
+
+  trivy-scan:
+    runs-on: ubuntu-latest
+    needs: build-test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Trivy
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          scan-type: 'fs'
+          ignore-unfixed: true
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '1'
+          vuln-type: 'os,library'
+          github-pat: ${{ secrets.GITHUB_TOKEN }}

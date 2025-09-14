@@ -5,7 +5,12 @@ node_modules
 .gitignore
 Dockerfile
 **/Dockerfile
+# Exclude entire Next.js build outputs so removed pages aren't resurrected
+**/.next
 **/.next/cache
+# Exclude legacy pages dirs now replaced by app router
+apps/web-automart/src/pages
+apps/web-autotrader/src/pages
 **/.turbo
 **/dist
 **/build

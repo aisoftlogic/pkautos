@@ -7,9 +7,12 @@ services:
     working_dir: /app
     depends_on:
       - postgres
+      - otel-collector
     environment:
-      - NODE_ENV=development
-      - PORT=3000
+      NODE_ENV: development
+      PORT: '3000'
+      OTEL_SERVICE_NAME: '@pkautos/api'
+      OTEL_EXPORTER_OTLP_ENDPOINT: 'http://otel-collector:4318/v1/traces'
     ports:
       - "3000:3000"
     healthcheck:
@@ -26,8 +29,8 @@ services:
     depends_on:
       - api
     environment:
-      - NODE_ENV=production
-      - PORT=3001
+      NODE_ENV: production
+      PORT: '3001'
     ports:
       - "3001:3001"
     healthcheck:
@@ -44,8 +47,8 @@ services:
     depends_on:
       - api
     environment:
-      - NODE_ENV=production
-      - PORT=3002
+      NODE_ENV: production
+      PORT: '3002'
     ports:
       - "3002:3002"
     healthcheck:
@@ -57,9 +60,9 @@ services:
   postgres:
     image: postgres:16-alpine
     environment:
-      - POSTGRES_USER=${POSTGRES_USER:-pkautos}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-pkautos}
-      - POSTGRES_DB=${POSTGRES_DB:-pkautos}
+      POSTGRES_USER: ${POSTGRES_USER:-pkautos}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pkautos}
+      POSTGRES_DB: ${POSTGRES_DB:-pkautos}
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
@@ -83,7 +86,7 @@ services:
   meilisearch:
     image: getmeili/meilisearch:v1.8
     environment:
-      - MEILI_NO_ANALYTICS=true
+      MEILI_NO_ANALYTICS: 'true'
     ports:
       - "7700:7700"
     healthcheck:
@@ -96,8 +99,8 @@ services:
     image: quay.io/minio/minio:RELEASE.2024-08-03T04-33-23Z
     command: server /data --console-address ":9001"
     environment:
-      - MINIO_ROOT_USER=${MINIO_ROOT_USER:-minio}
-      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-minio12345}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minio12345}
     volumes:
       - minio-data:/data
     ports:
@@ -111,10 +114,11 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:24.0.5
-    command: start-dev --http-port=8081
+    command: start-dev --http-port=8081 --hostname-strict=false --hostname-strict-https=false
     environment:
-      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN:-admin}
-      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      KC_HTTP_ENABLED: 'true'
     ports:
       - "8081:8081"
     healthcheck:
@@ -123,6 +127,66 @@ services:
       timeout: 5s
       retries: 10
 
+  otel-collector:
+    image: otel/opentelemetry-collector:0.104.0
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
+    ports:
+      - "4318:4318"
+      - "8888:8888"
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "-", "http://localhost:13133/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  prometheus:
+    image: prom/prometheus:v2.55.0
+    command: ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.retention.time=3d", "--storage.tsdb.path=/prometheus"]
+    volumes:
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./observability/prometheus-rules.yml:/etc/prometheus/prometheus-rules.yml:ro
+    ports:
+      - "9090:9090"
+    depends_on:
+      - api
+
+  loki:
+    image: grafana/loki:3.1.1
+    command: ["-config.file=/etc/loki/loki-config.yml"]
+    volumes:
+      - ./observability/loki-config.yml:/etc/loki/loki-config.yml:ro
+      - loki-data:/loki
+    ports:
+      - "3100:3100"
+
+  promtail:
+    image: grafana/promtail:3.1.1
+    command: ["--config.file=/etc/promtail/promtail-config.yml"]
+    volumes:
+      - ./observability/promtail-config.yml:/etc/promtail/promtail-config.yml:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    depends_on:
+      - loki
+
+  grafana:
+    image: grafana/grafana:11.1.0
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_PATHS_PROVISIONING: /etc/grafana/provisioning
+    volumes:
+      - ./observability/grafana-datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml:ro
+      - ./observability/grafana/dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml:ro
+      - ./observability/grafana/dashboards:/etc/grafana/dashboards:ro
+    ports:
+      - "3003:3000"
+    depends_on:
+      - prometheus
+      - loki
+
 volumes:
   pgdata: {}
   minio-data: {}
+  loki-data: {}

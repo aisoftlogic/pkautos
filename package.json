@@ -10,7 +10,10 @@
     "lint": "eslint . --ext .ts,.tsx --max-warnings=0",
     "format": "prettier --write .",
     "build": "echo build-root-skip",
-    "test": "echo no-root-tests"
+    "test": "echo no-root-tests",
+    "prepare": "command -v husky >/dev/null 2>&1 && husky install || echo 'husky skipped (binary not present)'",
+    "prepush:fast": "pnpm --filter @pkautos/api test && pnpm --filter @pkautos/web-automart test && pnpm --filter @pkautos/web-autotrader test",
+    "lint:ban-pages": "node scripts/check-no-pages.js"
   },
   "devDependencies": {
     "eslint": "^9.12.0",
@@ -21,6 +24,7 @@
     "eslint-config-prettier": "^9.1.0",
     "commitlint": "^19.3.0",
     "@commitlint/config-conventional": "^19.2.2"
+  ,"husky": "^9.0.11"
   },
   "engines": {
     "node": ">=18"
