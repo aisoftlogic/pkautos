@@ -1,0 +1,28 @@
+# Experimental pnpm-based Dockerfile for the API service
+# Allows future unification (currently production uses npm Dockerfile)
+# Build usage:
+#   docker build -f apps/api/Dockerfile.pnpm -t pkautos-api-pnpm ./
+
+ARG NODE_VERSION=22-alpine
+FROM node:${NODE_VERSION} AS base
+WORKDIR /app
+
+FROM base AS deps
+RUN corepack enable
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml* tsconfig.base.json ./
+COPY apps/api/package.json apps/api/package.json
+RUN pnpm install --filter @pkautos/api... --frozen-lockfile
+
+FROM base AS build
+RUN corepack enable
+COPY . .
+RUN pnpm --filter @pkautos/api build
+
+FROM node:${NODE_VERSION} AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=build /app/apps/api/dist ./dist
+COPY --from=build /app/apps/api/package.json ./package.json
+# Production install only api dependencies
+RUN corepack enable && pnpm install --prod --filter @pkautos/api... --frozen-lockfile
+CMD ["node","dist/main.js"]
