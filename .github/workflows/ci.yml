@@ -26,6 +26,20 @@ jobs:
             **/node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
 
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build workspaces
+        run: |
+          pnpm --filter @pkautos/api build || true
+          pnpm --filter @pkautos/web-automart build || true
+          pnpm --filter @pkautos/web-autotrader build || true
+
       - name: Login GHCR
         uses: docker/login-action@v3
         with:
@@ -53,6 +67,11 @@ jobs:
         run: |
           echo "TODO: helm upgrade --install release-name infra/helm/chart --namespace dev"
 
-      - name: Smoke tests (TODO)
+      - name: Smoke tests
         run: |
-          echo "TODO: k6 run tests/perf/smoke.js"
+          docker compose config
+          docker compose up -d api web-automart web-autotrader
+          sleep 20
+          bash scripts/smoke.sh
+          docker compose ps
+          docker compose logs --no-color --tail=200
