@@ -6,8 +6,13 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "outDir": "dist",
-    "types": ["node", "jest"]
+    "types": ["node", "jest"],
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "skipLibCheck": true
   },
-  "include": ["src/**/*"],
+  "include": ["src", "test"],
   "exclude": ["node_modules", "dist"]
 }
