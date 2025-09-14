@@ -1,6 +1,6 @@
 /** @type {import('jest').Config} */
 module.exports = {
-  testEnvironment: 'jsdom',
+  testEnvironment: 'node',
   testMatch: ['<rootDir>/test/**/*.(spec|test).{ts,tsx}'],
   transform: {
     '^.+\\.(t|j)sx?$': [
