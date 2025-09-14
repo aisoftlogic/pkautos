@@ -12,7 +12,6 @@
     "build": "echo build-root-skip",
     "test": "echo no-root-tests",
     "prepare": "command -v husky >/dev/null 2>&1 && husky install || echo 'husky skipped (binary not present)'",
-    "prepush:fast": "pnpm --filter @pkautos/api test",
     "lint:ban-pages": "node scripts/check-no-pages.js"
   },
   "devDependencies": {
