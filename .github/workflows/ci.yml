@@ -47,14 +47,8 @@ jobs:
       - name: Spin up stack
         run: |
           docker compose up -d api web-automart web-autotrader
-          echo 'Waiting for services...'
-          for i in {1..20}; do
-            curl -sf http://localhost:3000/healthz && break || sleep 1;
-          done
-          curl -sf http://localhost:3000/healthz
-          curl -sf http://localhost:3000/readyz
-          curl -sf http://localhost:3001/api/healthz || echo 'web-automart health endpoint missing'
-          curl -sf http://localhost:3002/api/healthz || echo 'web-autotrader health endpoint missing'
+          echo 'Waiting for services (smoke test with retries)...'
+          SMOKE_MAX_ATTEMPTS=30 SMOKE_SLEEP_SECONDS=2 bash scripts/smoke.sh
 
       - name: Show container logs (on failure)
         if: failure()
